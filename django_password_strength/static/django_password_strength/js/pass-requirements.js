@@ -11,19 +11,16 @@ if (typeof jQuery === 'undefined') {
     }
 
     var PassRequirements = function ($ref, options) {
+        var $self = this;
         this.$ref = $ref;
+        this.defaults = {};
 
-        var defaults = {};
-
-        if (
-            !options ||                     //if no options are passed                                    /*
-            options.defaults === true ||     //if default option is passed with defaults set to true      * Extend options with default ones
-            options.defaults === undefined   //if options are passed but defaults is not passed           */
+        if (!options ||                     //if no options are passed                                    /*
+             options.defaults === true ||     //if default option is passed with defaults set to true      * Extend options with default ones
+             options.defaults === undefined   //if options are passed but defaults is not passed           */
         ) {
-            if (!options) {                   //if no options are passed,
-                options = {};               //create an options object
-            }
-            defaults.rules = $.extend(true, {
+            options = options || {};
+            this.defaults.rules = $.extend(true, {
                 minlength: {
                     text: gettext("be at least minLength characters long"),
                     minLength: 8,
@@ -51,29 +48,19 @@ if (typeof jQuery === 'undefined') {
                 }
             }, options.rules);
         } else {
-            defaults = options;     //if options are passed with defaults === false
+            this.defaults = options;     //if options are passed with defaults === false
         }
 
-        if (!defaults.defaults && !defaults.rules) {
+        if (!this.defaults.defaults && !this.defaults.rules) {
             console.error('You must pass in your rules if defaults is set to false. Skipping this input with id:[' + this.id + '] with class:[' + this.classList + ']');
             return false;
         }
         this.$ref.keyup(function () {
-            var $this = $(this);
-            $.each(defaults.rules, function (key, rules) {
-                if (typeof rules.regex == 'string') {
-                    rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
-                }
-                if ($this.val().replace(rules.regex, "").length > rules.minLength - 1) {
-                    $this.next('.popover').find('#' + key).css('text-decoration', 'line-through');
-                } else {
-                    $this.next('.popover').find('#' + key).css('text-decoration', 'none');
-                }
-            });
+            $self.handle_strength_bar($(this));
         });
 
         var requirementList = "";
-        $.each(defaults.rules, function (key, rules) {
+        $.each(this.defaults.rules, function (key, rules) {
             requirementList += (("<li id='" + key + "'>" + rules.text).replace("minLength", rules.minLength));
         });
 
@@ -94,6 +81,19 @@ if (typeof jQuery === 'undefined') {
         });
 
     };
+
+    PassRequirements.prototype.handle_strength_bar = function($bar) {
+        $.each(this.defaults.rules, function (key, rules) {
+            if (typeof rules.regex == 'string') {
+                rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
+            }
+            if ($bar.val().replace(rules.regex, "").length > rules.minLength - 1) {
+                $bar.next('.popover').find('#' + key).css('text-decoration', 'line-through');
+            } else {
+                $bar.next('.popover').find('#' + key).css('text-decoration', 'none');
+            }
+        });
+    }
 
     $.fn.PassRequirements = function (options) {
         return this.each(function(index) {
