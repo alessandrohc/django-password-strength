@@ -71,23 +71,21 @@ if (typeof jQuery === 'undefined') {
             $(this).data('pass-req-id', i++);
 
             $(this).keyup(function () {
-                var this_ = $(this);
-                Object.getOwnPropertyNames(defaults.rules).forEach(function (val, idx, array) {
-                    var rules = defaults.rules[val];
+                var $this = $(this);
+                $.each(defaults.rules, function (key, rules) {
                     if (typeof rules.regex == 'string') {
                         rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
                     }
-                    if (this_.val().replace(rules.regex, "").length > defaults.rules[val].minLength - 1) {
-                        this_.next('.popover').find('#' + val).css('text-decoration', 'line-through');
+                    if ($this.val().replace(rules.regex, "").length > rules.minLength - 1) {
+                        $this.next('.popover').find('#' + key).css('text-decoration', 'line-through');
                     } else {
-                        this_.next('.popover').find('#' + val).css('text-decoration', 'none');
+                        $this.next('.popover').find('#' + key).css('text-decoration', 'none');
                     }
-
-                })
+                });
             });
 
-            Object.getOwnPropertyNames(defaults.rules).forEach(function (val, idx, array) {
-                requirementList += (("<li id='" + val + "'>" + defaults.rules[val].text).replace("minLength", defaults.rules[val].minLength));
+            $.each(defaults.rules, function (key, rules) {
+                requirementList += (("<li id='" + key + "'>" + rules.text).replace("minLength", rules.minLength));
             });
             try {
                 $(this).popover({
