@@ -3,21 +3,17 @@ if (typeof jQuery === 'undefined') {
 }
 
 (function ($) {
-    $.fn.PassRequirements = function (options) {
-        // Provide fake gettext for when it is not available
-        if( typeof gettext !== 'function' ) { gettext = function(text) { return text; }; }
-        /*
-         * TODO
-         * ====
-         * 
-         * store regexes in variables so they can be used by users through string 
-         * specifications,ex 'number', 'special', etc
-         * 
-         */
-
-        var defaults = {
-//            defaults: true
+    // Provide fake gettext for when it is not available
+    if( typeof gettext !== 'function' ) {
+        gettext = function(text) {
+            return text;
         };
+    }
+
+    var PassRequirements = function ($ref, options) {
+        this.$ref = $ref;
+
+        var defaults = {};
 
         if (
             !options ||                     //if no options are passed                                    /*
@@ -58,50 +54,54 @@ if (typeof jQuery === 'undefined') {
             defaults = options;     //if options are passed with defaults === false
         }
 
-        var i = 0;
-
-        return this.each(function () {
-
-            if (!defaults.defaults && !defaults.rules) {
-                console.error('You must pass in your rules if defaults is set to false. Skipping this input with id:[' + this.id + '] with class:[' + this.classList + ']');
-                return false;
-            }
-
-            var requirementList = "";
-            $(this).data('pass-req-id', i++);
-
-            $(this).keyup(function () {
-                var $this = $(this);
-                $.each(defaults.rules, function (key, rules) {
-                    if (typeof rules.regex == 'string') {
-                        rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
-                    }
-                    if ($this.val().replace(rules.regex, "").length > rules.minLength - 1) {
-                        $this.next('.popover').find('#' + key).css('text-decoration', 'line-through');
-                    } else {
-                        $this.next('.popover').find('#' + key).css('text-decoration', 'none');
-                    }
-                });
-            });
-
+        if (!defaults.defaults && !defaults.rules) {
+            console.error('You must pass in your rules if defaults is set to false. Skipping this input with id:[' + this.id + '] with class:[' + this.classList + ']');
+            return false;
+        }
+        this.$ref.keyup(function () {
+            var $this = $(this);
             $.each(defaults.rules, function (key, rules) {
-                requirementList += (("<li id='" + key + "'>" + rules.text).replace("minLength", rules.minLength));
-            });
-            try {
-                $(this).popover({
-                    title: gettext('Password Requirements'),
-                    trigger: options.trigger ? options.trigger : 'focus',
-                    html: true,
-                    placement: options.popoverPlacement ? options.popoverPlacement : 'auto bottom',
-                    content: gettext('Your password should:') + '<ul>' + requirementList + '</ul>'
-                });
-            } catch (e) {
-                throw new Error('PassRequirements requires Bootstraps Popover plugin');
-            }
-            $(this).focus(function () {
-                $(this).keyup();
+                if (typeof rules.regex == 'string') {
+                    rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
+                }
+                if ($this.val().replace(rules.regex, "").length > rules.minLength - 1) {
+                    $this.next('.popover').find('#' + key).css('text-decoration', 'line-through');
+                } else {
+                    $this.next('.popover').find('#' + key).css('text-decoration', 'none');
+                }
             });
         });
+
+        var requirementList = "";
+        $.each(defaults.rules, function (key, rules) {
+            requirementList += (("<li id='" + key + "'>" + rules.text).replace("minLength", rules.minLength));
+        });
+
+        try {
+            this.$ref.popover({
+                title: gettext('Password Requirements'),
+                trigger: options.trigger ? options.trigger : 'focus',
+                html: true,
+                placement: options.popoverPlacement ? options.popoverPlacement : 'auto bottom',
+                content: gettext('Your password should:') + '<ul>' + requirementList + '</ul>'
+            });
+        } catch (e) {
+            throw new Error('PassRequirements requires Bootstraps Popover plugin');
+        }
+
+        this.$ref.focus(function () {
+            $(this).keyup();
+        });
+
     };
 
+    $.fn.PassRequirements = function (options) {
+        return this.each(function(index) {
+            var $this = $(this), data = $this.data('pass_requirements');
+            if (!data) {
+                $this.data('pass-req-id', index);
+                $this.data('pass_requirements', new PassRequirements($this, options));
+            }
+        });
+    }
 }(jQuery));
