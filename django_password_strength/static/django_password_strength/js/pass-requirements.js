@@ -56,7 +56,7 @@ if (typeof jQuery === 'undefined') {
             return false;
         }
         this.$ref.keyup(function () {
-            $self.handle_strength_bar($(this));
+            $self.handle_rules($(this));
         });
 
         var requirementList = "";
@@ -82,7 +82,7 @@ if (typeof jQuery === 'undefined') {
 
     };
 
-    PassRequirements.prototype.handle_strength_bar = function($bar) {
+    PassRequirements.prototype.handle_rules = function($bar) {
         $.each(this.defaults.rules, function (key, rules) {
             if (typeof rules.regex == 'string') {
                 rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
