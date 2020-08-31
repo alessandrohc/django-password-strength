@@ -80,7 +80,7 @@ class PasswordStrengthInput(PasswordInputCompat):
     class Media(object):
         js = (
             'django_password_strength/js/zxcvbn.js',
-            'django_password_strength/js/password_strength.js',
+            'django_password_strength/js/password-strength.js',
             'django_password_strength/js/pass-requirements.js',
             'django_password_strength/js/rules.js',
         )
