@@ -43,15 +43,15 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Garanta que o valor tenha pelo menos %(limit_value)d caracter (tem "
+"Deveria que o valor tenha pelo menos %(limit_value)d letra (tem "
 "%(show_value)d)."
 msgstr[1] ""
-"Garanta que o valor tenha pelo menos %(limit_value)d caracteres (tem "
+"Deveria que o valor tenha pelo menos %(limit_value)d letras (tem "
 "%(show_value)d)."
 
 #: .\django_password_strength\validators.py:31
 msgid "be at least minLength characters long"
-msgstr "Deveria ter pelo menos minLength caractere(s)"
+msgstr "Deveria ter pelo menos minLength letra(s)"
 
 #: .\django_password_strength\validators.py:37
 #, python-format
@@ -65,12 +65,12 @@ msgstr[0] ""
 "Deveria conter pelo menos %(limit_value)d letra especial (tem "
 "%(show_value)d)."
 msgstr[1] ""
-"Deveria conter pelo menos %(limit_value)d caracteres especiais (tem "
+"Deveria conter pelo menos %(limit_value)d letras especiais (tem "
 "%(show_value)d)."
 
 #: .\django_password_strength\validators.py:55
 msgid "Your input should contain at least minLength special character"
-msgstr "Deveria ter pelo menos minLength caractere(s) especial"
+msgstr "Deveria ter pelo menos minLength letra(s) especial"
 
 #: .\django_password_strength\validators.py:63
 #, python-format
