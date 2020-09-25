@@ -84,7 +84,7 @@ class PolicyContainLowercaseValidator(PolicyBaseValidator):
 class PolicyContainUppercaseValidator(PolicyBaseValidator):
     message = ungettext_lazy(
         'Your input should contain at least %(limit_value)d upper case character (it has %(show_value)d).',
-        'Your input should contain at least %(limit_value)d upper case characters (it has %(show_value)d).'
+        'Your input should contain at least %(limit_value)d upper case characters (it has %(show_value)d).',
         'limit_value')
     code = 'uppercase_length'
 
