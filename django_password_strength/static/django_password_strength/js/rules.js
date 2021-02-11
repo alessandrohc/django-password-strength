@@ -1,3 +1,5 @@
 $(function(){
-   $(document).rules();
+   if ($.fn.rules) {
+      $(document).rules();
+   }
 });
