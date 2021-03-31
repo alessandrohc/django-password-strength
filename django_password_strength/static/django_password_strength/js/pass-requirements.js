@@ -83,15 +83,15 @@ if (typeof jQuery === 'undefined') {
 
     };
 
-    PassRequirements.prototype.handle_rules = function($bar) {
+    PassRequirements.prototype.handle_rules = function($el) {
         $.each(this.defaults.rules, function (key, rules) {
             if (typeof rules.regex == 'string') {
                 rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
             }
-            if ($bar.val().replace(rules.regex, "").length > rules.minLength - 1) {
-                $bar.next('.popover').find('#' + key).css('text-decoration', 'line-through');
+            if ($el.val().replace(rules.regex, "").length > rules.minLength - 1) {
+                $el.next('.popover').find('#' + key).css('text-decoration', 'line-through');
             } else {
-                $bar.next('.popover').find('#' + key).css('text-decoration', 'none');
+                $el.next('.popover').find('#' + key).css('text-decoration', 'none');
             }
         });
     }
