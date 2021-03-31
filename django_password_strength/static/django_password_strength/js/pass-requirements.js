@@ -67,9 +67,10 @@ if (typeof jQuery === 'undefined') {
         try {
             this.$ref.popover({
                 title: gettext('Password Requirements'),
-                trigger: options.trigger ? options.trigger : 'focus',
+                trigger: options.popoverTrigger || 'focus',
+                // container: 'body',
                 html: true,
-                placement: options.popoverPlacement ? options.popoverPlacement : 'auto bottom',
+                placement: options.popoverPlacement || 'auto',
                 content: gettext('Your password should:') + '<ul>' + requirementList + '</ul>'
             });
         } catch (e) {
