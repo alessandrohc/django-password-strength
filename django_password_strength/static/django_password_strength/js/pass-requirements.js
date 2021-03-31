@@ -73,8 +73,8 @@ if (typeof jQuery === 'undefined') {
                 placement: options.popoverPlacement || 'auto',
                 content: gettext('Your password should:') + '<ul>' + requirementList + '</ul>'
             });
-        } catch (e) {
-            throw new Error('PassRequirements requires Bootstraps Popover plugin');
+        } catch (exc) {
+            throw new Error('PassRequirements requires Bootstraps Popover plugin: ' + exc);
         }
 
         this.$el.focus(function () {
