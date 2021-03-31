@@ -10,9 +10,9 @@ if (typeof jQuery === 'undefined') {
         };
     }
 
-    var PassRequirements = function ($ref, options) {
+    var PassRequirements = function ($el, options) {
         var $self = this;
-        this.$ref = $ref;
+        this.$el = $el;
         this.defaults = {};
 
         if (!options ||                     //if no options are passed                                    /*
@@ -55,7 +55,7 @@ if (typeof jQuery === 'undefined') {
             console.error('You must pass in your rules if defaults is set to false. Skipping this input with id:[' + this.id + '] with class:[' + this.classList + ']');
             return false;
         }
-        this.$ref.keyup(function () {
+        this.$el.keyup(function () {
             $self.handle_rules($(this));
         });
 
@@ -65,7 +65,7 @@ if (typeof jQuery === 'undefined') {
         });
 
         try {
-            this.$ref.popover({
+            this.$el.popover({
                 title: gettext('Password Requirements'),
                 trigger: options.popoverTrigger || 'focus',
                 // container: 'body',
@@ -77,7 +77,7 @@ if (typeof jQuery === 'undefined') {
             throw new Error('PassRequirements requires Bootstraps Popover plugin');
         }
 
-        this.$ref.focus(function () {
+        this.$el.focus(function () {
             $(this).keyup();
         });
 
