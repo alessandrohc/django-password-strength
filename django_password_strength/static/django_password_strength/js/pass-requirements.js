@@ -88,11 +88,12 @@ if (typeof jQuery === 'undefined') {
             if (typeof rules.regex == 'string') {
                 rules.regex = new RegExp(rules.regex, rules.regex_flags ? rules.regex_flags: null);
             }
-            var tip = $($el.data('bs.popover').tip);
+            var popover = $el.data('bs.popover'),
+                $tip = $(popover.$tip || popover.tip);
             if ($el.val().replace(rules.regex, "").length > rules.minLength - 1) {
-                tip.find('#' + key).css('text-decoration', 'line-through');
+                $tip.find('#' + key).css('text-decoration', 'line-through');
             } else {
-                tip.find('#' + key).css('text-decoration', 'none');
+                $tip.find('#' + key).css('text-decoration', 'none');
             }
         });
     }
