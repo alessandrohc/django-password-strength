@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-01 17:51-0300\n"
+"POT-Creation-Date: 2021-04-01 17:56-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,31 +16,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:25
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:25
 msgid "Must have at least minLength characters long"
 msgstr "Deve ter pelo menos minLength caractere(s)"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:29
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:29
 msgid "Must have at least minLength special character"
 msgstr "Deve ter pelo menos minLength caractere(s) especial"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:35
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:35
 msgid "Must have at least minLength lower case character"
 msgstr "Deve ter pelo menos minLength letra(s) minúscula(s)"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:40
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:40
 msgid "Must have at least minLength upper case character"
 msgstr "Deve ter pelo menos minLength letra(s) maiúscula(s)"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:45
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:45
 msgid "Must have at least minLength number"
 msgstr "Deve ter pelo menos minLength número(s)"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:69
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:69
 msgid "Password Requirements"
 msgstr "Requerimentos da senha"
 
-#: django_password_strength/static/django_password_strength/js/pass-requirements.js:74
+#: django_password_strength/static/django_password_strength/js/password-requirements.js:74
 msgid "Your password should:"
 msgstr "Sua senha:"
 
