@@ -19,7 +19,7 @@ class PasswordMutedInput(PasswordInputCompat):
 
     class Media(object):
         js = (
-            'django_password_strength/js/pass-requirements.js',
+            'django_password_strength/js/password-requirements.js',
             'django_password_strength/js/password-strength-rules.js',
         )
         css = {
@@ -81,7 +81,7 @@ class PasswordStrengthInput(PasswordInputCompat):
         js = (
             'django_password_strength/js/zxcvbn.js',
             'django_password_strength/js/password-strength.js',
-            'django_password_strength/js/pass-requirements.js',
+            'django_password_strength/js/password-requirements.js',
             'django_password_strength/js/password-strength-rules.js',
         )
         css = {
