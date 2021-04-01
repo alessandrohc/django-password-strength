@@ -22,27 +22,27 @@ if (typeof jQuery === 'undefined') {
             options = options || {};
             this.defaults.rules = $.extend(true, {
                 minlength: {
-                    text: gettext("be at least minLength characters long"),
+                    text: gettext("Must have at least minLength characters long"),
                     minLength: 8,
                 },
                 containSpecialChars: {
-                    text: gettext("Your input should contain at least minLength special character"),
+                    text: gettext("Must have at least minLength special character"),
                     minLength: 1,
                     regex: '([^!%&@#$^*?_~])',
                     regex_flags: 'g'
                 },
                 containLowercase: {
-                    text: gettext("Your input should contain at least minLength lower case character"),
+                    text: gettext("Must have at least minLength lower case character"),
                     minLength: 1,
                     regex: new RegExp('[^a-z]', 'g')
                 },
                 containUppercase: {
-                    text: gettext("Your input should contain at least minLength upper case character"),
+                    text: gettext("Must have at least minLength upper case character"),
                     minLength: 1,
                     regex: new RegExp('[^A-Z]', 'g')
                 },
                 containNumbers: {
-                    text: gettext("Your input should contain at least minLength number"),
+                    text: gettext("Must have at least minLength number"),
                     minLength: 1,
                     regex: new RegExp('[^0-9]', 'g')
                 }
