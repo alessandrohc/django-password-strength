@@ -46,7 +46,7 @@ msgstr "Sua senha:"
 
 #: django_password_strength/static/django_password_strength/js/password-strength.js:81
 msgid "only an instant"
-msgstr "somente uma instância"
+msgstr "pouco tempo"
 
 #: django_password_strength/static/django_password_strength/js/password-strength.js:84
 msgid "minute"
