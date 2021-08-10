@@ -70,7 +70,10 @@ if (typeof jQuery === 'undefined') {
                 trigger: options.popoverTrigger || 'focus',
                 // container: 'body',
                 html: true,
-                placement: options.popoverPlacement || 'auto',
+                popperConfig: {
+                    placement: options.popoverPlacement || 'bottom-start',
+                },
+                template:'<div class="popover mw-100 m-0" role="tooltip"><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
                 content: gettext('Your password should:') + '<ul>' + requirementList + '</ul>'
             });
         } catch (exc) {
