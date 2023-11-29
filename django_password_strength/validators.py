@@ -1,6 +1,6 @@
 import password_strength as pwd
 from django.core.validators import BaseValidator
-from django.utils.translation import gettext, ungettext_lazy
+from django.utils.translation import gettext, ngettext_lazy
 
 
 class PolicyBaseValidator(BaseValidator):
@@ -9,7 +9,7 @@ class PolicyBaseValidator(BaseValidator):
 
 
 class PolicyMinLengthValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Must have at least %(limit_value)d character (it has %(show_value)d).',
         'Must have at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -32,7 +32,7 @@ class PolicyMinLengthValidator(PolicyBaseValidator):
 
 
 class PolicyContainSpecialCharsValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Must have at least %(limit_value)d special character (it has %(show_value)d).',
         'Must have at least %(limit_value)d special characters (it has %(show_value)d).',
         'limit_value')
@@ -57,7 +57,7 @@ class PolicyContainSpecialCharsValidator(PolicyBaseValidator):
 
 
 class PolicyContainLowercaseValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Must have at least %(limit_value)d lower case character (it has %(show_value)d).',
         'Must have at least %(limit_value)d lower case characters (it has %(show_value)d).',
         'limit_value')
@@ -82,7 +82,7 @@ class PolicyContainLowercaseValidator(PolicyBaseValidator):
 
 
 class PolicyContainUppercaseValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Must have at least %(limit_value)d upper case character (it has %(show_value)d).',
         'Must have at least %(limit_value)d upper case characters (it has %(show_value)d).',
         'limit_value')
@@ -107,7 +107,7 @@ class PolicyContainUppercaseValidator(PolicyBaseValidator):
 
 
 class PolicyContainNumbersValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Must have at least %(limit_value)d number (it has %(show_value)d).',
         'Must have at least %(limit_value)d numbers (it has %(show_value)d).',
         'limit_value')
