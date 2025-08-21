@@ -28,21 +28,24 @@
                 if( $(this).val() ) {
                     var result = zxcvbn( $(this).val() );
 
-                    if( result.score < 3 ) {
-                        password_strength_bar.removeClass('progress-bar-success').addClass('progress-bar-warning');
+                    if( result.score < 2 ) {
+                        password_strength_bar.removeClass('bg-warning').addClass('bg-danger');
+                        password_strength_info.find('.label').removeClass('hidden');
+                    } else if( result.score < 4 ) {
+                        password_strength_bar.removeClass('bg-success bg-danger').addClass('bg-warning');
                         password_strength_info.find('.label').removeClass('hidden');
                     } else {
-                        password_strength_bar.removeClass('progress-bar-warning').addClass('progress-bar-success');
+                        password_strength_bar.removeClass('bg-warning').addClass('bg-success');
                         password_strength_info.find('.label').addClass('hidden');
                     }
-                    password_strength_bar_wrap.removeClass("hide").addClass("show");
+                    password_strength_bar_wrap.removeClass("d-none");
                     password_strength_bar.width( ((result.score+1)/5)*100 + '%' ).attr('aria-valuenow', result.score + 1);
                     password_strength_info.find('.password_strength_time').html(self.display_time(result.crack_time));
                     password_strength_info.removeClass('hidden');
                 } else {
-                    password_strength_bar.removeClass('progress-bar-success').addClass('progress-bar-warning');
+                    password_strength_bar.removeClass('bg-success bg-warning').addClass('bg-danger');
                     password_strength_bar.width( '0%' ).attr('aria-valuenow', 0);
-                    password_strength_bar_wrap.removeClass('show').addClass("hide");
+                    password_strength_bar_wrap.addClass("d-none");
                     password_strength_info.addClass('hidden');
                 }
                 self.match_passwords($(this));

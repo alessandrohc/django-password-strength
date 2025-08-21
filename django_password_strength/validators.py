@@ -1,6 +1,6 @@
 import password_strength as pwd
 from django.core.validators import BaseValidator
-from django.utils.translation import gettext, ungettext_lazy
+from django.utils.translation import gettext, ngettext_lazy
 
 
 class PolicyBaseValidator(BaseValidator):
@@ -9,9 +9,9 @@ class PolicyBaseValidator(BaseValidator):
 
 
 class PolicyMinLengthValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
-        'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
-        'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
+    message = ngettext_lazy(
+        'Must have at least %(limit_value)d character (it has %(show_value)d).',
+        'Must have at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
     code = 'min_value'
 
@@ -27,14 +27,14 @@ class PolicyMinLengthValidator(PolicyBaseValidator):
     def js_requirement(self):
         return {'minlength': {
             'minLength': self.limit_value,
-            'text': gettext('be at least minLength characters long'),
+            'text': gettext('Must have at least minLength characters long'),
         }}
 
 
 class PolicyContainSpecialCharsValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
-        'Your input should contain at least %(limit_value)d special character (it has %(show_value)d).',
-        'Your input should contain at least %(limit_value)d special characters (it has %(show_value)d).',
+    message = ngettext_lazy(
+        'Must have at least %(limit_value)d special character (it has %(show_value)d).',
+        'Must have at least %(limit_value)d special characters (it has %(show_value)d).',
         'limit_value')
     code = 'special_length'
 
@@ -50,16 +50,16 @@ class PolicyContainSpecialCharsValidator(PolicyBaseValidator):
     def js_requirement(self):
         return {'containSpecialChars': {
             'minLength': self.limit_value,
-            'text': gettext('Your input should contain at least minLength special character'),
+            'text': gettext('Must have at least minLength special character'),
             'regex': "([^!%&@#$^*?_~])",
             'regex_flags': 'g'
         }}
 
 
 class PolicyContainLowercaseValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
-        'Your input should contain at least %(limit_value)d lower case character (it has %(show_value)d).',
-        'Your input should contain at least %(limit_value)d lower case characters (it has %(show_value)d).',
+    message = ngettext_lazy(
+        'Must have at least %(limit_value)d lower case character (it has %(show_value)d).',
+        'Must have at least %(limit_value)d lower case characters (it has %(show_value)d).',
         'limit_value')
     code = 'lowercase_length'
 
@@ -77,14 +77,14 @@ class PolicyContainLowercaseValidator(PolicyBaseValidator):
             'minLength': self.limit_value,
             'regex': '[^a-z]',
             'regex_flags': 'g',
-            'text': gettext("Your input should contain at least minLength lower case character")
+            'text': gettext("Must have at least minLength lower case character")
         }}
 
 
 class PolicyContainUppercaseValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
-        'Your input should contain at least %(limit_value)d upper case character (it has %(show_value)d).',
-        'Your input should contain at least %(limit_value)d upper case characters (it has %(show_value)d).'
+    message = ngettext_lazy(
+        'Must have at least %(limit_value)d upper case character (it has %(show_value)d).',
+        'Must have at least %(limit_value)d upper case characters (it has %(show_value)d).',
         'limit_value')
     code = 'uppercase_length'
 
@@ -102,14 +102,14 @@ class PolicyContainUppercaseValidator(PolicyBaseValidator):
             'minLength': self.limit_value,
             'regex': '[^A-Z]',
             'regex_flags': 'g',
-            'text': gettext("Your input should contain at least minLength upper case character")
+            'text': gettext("Must have at least minLength upper case character")
         }}
 
 
 class PolicyContainNumbersValidator(PolicyBaseValidator):
-    message = ungettext_lazy(
-        'Your input should contain at least %(limit_value)d number (it has %(show_value)d).',
-        'Your input should contain at least %(limit_value)d numbers (it has %(show_value)d).',
+    message = ngettext_lazy(
+        'Must have at least %(limit_value)d number (it has %(show_value)d).',
+        'Must have at least %(limit_value)d numbers (it has %(show_value)d).',
         'limit_value')
     code = 'number_length'
 
@@ -127,5 +127,5 @@ class PolicyContainNumbersValidator(PolicyBaseValidator):
             'minLength': self.limit_value,
             'regex': '[^0-9]',
             'regex_flags': 'g',
-            'text': gettext("Your input should contain at least minLength number")
+            'text': gettext("Must have at least minLength number")
         }}

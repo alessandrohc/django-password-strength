@@ -19,7 +19,8 @@ class PasswordMutedInput(PasswordInputCompat):
 
     class Media(object):
         js = (
-            'django_password_strength/js/pass-requirements.js',
+            'django_password_strength/js/password-requirements.js',
+            'django_password_strength/js/password-strength-rules.js',
         )
         css = {
             'screen': ('django_password_strength/css/password-strength.css',)
@@ -36,7 +37,7 @@ class PasswordMutedInput(PasswordInputCompat):
         html = super(PasswordInput, self).render(name, value, attrs, **kwargs)
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         # strength rules
-        html += render_to_string("django_password_strength/widgets/strength-rules.txt",
+        html += render_to_string("django_password_strength/widgets/strength-rules.html",
                                  context={'attrs': final_attrs,
                                           'validators': validators,
                                           'validators_defaults': validators_defaults})
@@ -70,7 +71,7 @@ class PasswordStrengthInput(PasswordInputCompat):
         if show_progressbar_info:
             html += render_to_string("django_password_strength/widgets/progressbar-info.html",
                                      context=final_attrs)
-        html += render_to_string("django_password_strength/widgets/strength-rules.txt",
+        html += render_to_string("django_password_strength/widgets/strength-rules.html",
                                  context={'attrs': final_attrs,
                                           'validators': validators,
                                           'validators_defaults': validators_defaults})
@@ -79,8 +80,9 @@ class PasswordStrengthInput(PasswordInputCompat):
     class Media(object):
         js = (
             'django_password_strength/js/zxcvbn.js',
-            'django_password_strength/js/password_strength.js',
-            'django_password_strength/js/pass-requirements.js',
+            'django_password_strength/js/password-strength.js',
+            'django_password_strength/js/password-requirements.js',
+            'django_password_strength/js/password-strength-rules.js',
         )
         css = {
             'screen': ('django_password_strength/css/password-strength.css',)

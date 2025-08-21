@@ -1,0 +1,22 @@
+{% load djpassword_strength_tags %}
+<script type="application/javascript">
+(function ($) {
+    var PasswordStrengthRules = function ($el, options) {
+        this.$el = $el;
+
+        var rules = {}
+        {% for validator in validators %}
+        rules = $.extend(rules, {{validator|jsonify|safe}});
+        {% endfor %}
+
+        $el.PassRequirements({
+            rules: rules,
+            defaults: {{validators_defaults|jsonify|safe}}
+        });
+    }
+    $.fn.password_strength_rules = function(options) {
+        var $el = $("#{{attrs.id}}");
+        return new PasswordStrengthRules($el, options);
+    }
+})(jQuery);
+</script>
