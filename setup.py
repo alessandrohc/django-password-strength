@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-password-strength',
-    version='1.2.2',
+    version='1.2.3',
     url='http://thegoods.aj7may.com/django-password-strength',
     author='A.J. May',
     author_email='aj7may@gmail.com',
@@ -11,7 +11,9 @@ setup(
     license='BSD',
     packages=find_packages(),
     include_package_data=True,
-    install_requires = ['password-strength'],
+    install_requires=[
+        'password-strength @ https://github.com/alessandrohc/py-password-strength/archive/refs/tags/v0.0.5.zip#egg=password-strength-0.0.5',
+    ],
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
