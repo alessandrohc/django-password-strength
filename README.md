@@ -2,14 +2,17 @@
 
 An extension of the Django password widget including a password strength meter and crack time powered by [zxcvbn](https://github.com/lowe/zxcvbn).
 
-![Empty Password](http://thegoods.aj7may.com/content/images/2013/Dec/Screen_Shot_2013_12_18_at_9_05_38_AM.png)
-
-![Weak Password](http://thegoods.aj7may.com/content/images/2013/Dec/Screen_Shot_2013_12_18_at_9_06_05_AM.png)
-
-![Strong Password](http://thegoods.aj7may.com/content/images/2013/Dec/Screen_Shot_2013_12_18_at_9_06_32_AM.png)
+Maintained by [Alessandro Hecht](https://github.com/alessandrohc) at
+[alessandrohc/django-password-strength](https://github.com/alessandrohc/django-password-strength).
+See [Credits](#credits) for the upstream history.
 
 ### Install:
-`> pip install django-password-strength`
+
+    pip install git+https://github.com/alessandrohc/django-password-strength.git@1.4.1
+
+Or pin it in `requirements.txt`:
+
+    django-password-strength @ git+https://github.com/alessandrohc/django-password-strength.git@1.4.1
 
 ### Usage:
 
@@ -21,9 +24,11 @@ An extension of the Django password widget including a password strength meter a
 
 ### Translations:
 
-There are currently no translations already available, but all the text is translatable, you just have to translate it yourself.
+Catalogs are bundled for **Brazilian Portuguese (`pt_BR`)** and **Russian (`ru`)**. Every
+user-facing string is translatable, so adding another language only means shipping a new
+catalog under `django_password_strength/locale/`.
 
-For the javascript translations be sure to add the javascript translation catalog [provided by django](https://docs.djangoproject.com/en/1.7/topics/i18n/translation/#using-the-javascript-translation-catalog) or use something like [django-statici18n](https://github.com/zyegfryed/django-statici18n) for a static version of the catalog. If you don't want translations you don't have to add the catalog to your page.
+For the javascript translations be sure to add the javascript translation catalog [provided by django](https://docs.djangoproject.com/en/stable/topics/i18n/translation/#using-the-javascript-translation-catalog) or use something like [django-statici18n](https://github.com/zyegfryed/django-statici18n) for a static version of the catalog. If you don't want translations you don't have to add the catalog to your page.
 
 ### Example:
 
@@ -70,3 +75,10 @@ _forms.py_
         confirm_passphrase2 = forms.CharField(
             widget=PasswordConfirmationInput(confirm_with='passphrase2')
         )
+
+### Credits:
+
+Originally created by A.J. May ([aj-may/django-password-strength](https://github.com/aj-may/django-password-strength)),
+with Python 3 / modern Django work by Alex Silva ([alexsilva/django-password-strength](https://github.com/alexsilva/django-password-strength)).
+
+Released under the BSD 3-Clause license — see [LICENSE.md](LICENSE.md) and [AUTHORS.md](AUTHORS.md).
