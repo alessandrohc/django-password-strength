@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-password-strength"
+version = "1.5.0"
+description = "An extension of the Django password widget including a password strength meter and crack time powered by zxcvbn."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE.md"]
+keywords = ["password", "meter", "zxcvbn", "strength", "security", "django"]
+authors = [
+    { name = "A.J. May", email = "aj7may@gmail.com" },
+]
+maintainers = [
+    { name = "Alessandro Hecht", email = "alessandrohc@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Natural Language :: Russian",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "Django>=4.2,<6.0",
+    # Upstream on PyPI. The former direct reference to the
+    # alessandrohc/py-password-strength fork was dropped in 1.5.0: the fork's runtime
+    # package is byte-identical to this release apart from a `__version__` line, its
+    # changes being confined to test tooling. 0.0.5 of the fork also satisfies this
+    # range, so environments already carrying it need no reinstall.
+    "password-strength>=0.0.3.post2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://github.com/alessandrohc/django-password-strength"
+Source = "https://github.com/alessandrohc/django-password-strength"
+Upstream = "https://github.com/aj-may/django-password-strength"
+
+[tool.setuptools]
+# Templates, static assets and compiled catalogs live inside the package and are
+# selected by MANIFEST.in. Stated explicitly rather than relying on the default so the
+# wheel contents do not hinge on a setuptools version.
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["django_password_strength*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    # Promote deprecations to failures. Django announces removals as
+    # RemovedInDjangoXXWarning, which subclasses (Pending)DeprecationWarning, so this is
+    # what turns "still works on 5.2" into "will still work on 6.0". Verified clean
+    # across the whole supported matrix, hence global rather than scoped to this
+    # package: noise from a dependency is worth seeing too. Add a targeted `ignore::`
+    # entry -- never widen this one -- if upstream starts warning about its own code.
+    "error::DeprecationWarning",
+    "error::PendingDeprecationWarning",
+]

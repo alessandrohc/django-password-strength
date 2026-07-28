@@ -25,7 +25,12 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
-nosetests.xml
+.pytest_cache
+htmlcov
+
+# Throwaway matrix venvs (see README, "Running the tests")
+.venv
+.venvs
 
 # Mr Developer
 .mr.developer.cfg
