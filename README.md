@@ -6,13 +6,18 @@ Maintained by [Alessandro Hecht](https://github.com/alessandrohc) at
 [alessandrohc/django-password-strength](https://github.com/alessandrohc/django-password-strength).
 See [Credits](#credits) for the upstream history.
 
+### Requirements:
+
+Python **3.10 – 3.13**, Django **4.2 – 5.2**. Every combination in that range is exercised
+in CI, except the two Django releases that predate Python 3.13 support (4.2 and 5.0).
+
 ### Install:
 
-    pip install git+https://github.com/alessandrohc/django-password-strength.git@1.4.1
+    pip install git+https://github.com/alessandrohc/django-password-strength.git@1.5.0
 
 Or pin it in `requirements.txt`:
 
-    django-password-strength @ git+https://github.com/alessandrohc/django-password-strength.git@1.4.1
+    django-password-strength @ git+https://github.com/alessandrohc/django-password-strength.git@1.5.0
 
 ### Usage:
 
@@ -75,6 +80,27 @@ _forms.py_
         confirm_passphrase2 = forms.CharField(
             widget=PasswordConfirmationInput(confirm_with='passphrase2')
         )
+
+### Running the tests:
+
+The suite is offline and needs no database. Install the package with its test extra and
+run pytest:
+
+    pip install -e ".[test]"
+    pytest -q
+
+`tests/test_locale.py` recompiles the `.po` sources to check them against the committed
+`.mo` files; that check skips itself when `msgfmt` (GNU gettext) is not on `PATH`.
+
+To reproduce a single matrix cell locally, pin Django in a throwaway environment:
+
+    uv venv --python 3.13 .venv
+    uv pip install --python .venv/bin/python "Django~=5.2.0" -e ".[test]"
+    .venv/bin/python -m pytest -q
+
+Deprecation warnings are promoted to errors (see `filterwarnings` in `pyproject.toml`), so
+a `RemovedInDjangoXXWarning` raised anywhere in the suite fails the run. That is the early
+signal for the next Django release, and it is deliberately not scoped to this package.
 
 ### Credits:
 
