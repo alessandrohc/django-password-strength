@@ -38,6 +38,13 @@ jobs:
       - name: Show resolved versions
         run: python -c "import django, sys; print(sys.version); print(django.get_version())"
 
+      - name: Install gettext
+        # Not present on the ubuntu-latest image, so msgfmt has to be installed
+        # explicitly -- without it the step below exits 127 and the suite never runs.
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gettext
+
       - name: Check gettext is available
         # test_locale.py skips the .po/.mo sync check when msgfmt is missing, which
         # would let a stale catalog through CI unnoticed.
