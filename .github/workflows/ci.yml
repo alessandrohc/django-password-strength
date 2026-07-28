@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: py${{ matrix.python-version }} / django${{ matrix.django-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        django-version: ['4.2', '5.0', '5.1', '5.2']
+        exclude:
+          # Django 4.2 and 5.0 do not support Python 3.13.
+          - python-version: '3.13'
+            django-version: '4.2'
+          - python-version: '3.13'
+            django-version: '5.0'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and pinned Django
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "Django~=${{ matrix.django-version }}.0" -e ".[test]"
+
+      - name: Show resolved versions
+        run: python -c "import django, sys; print(sys.version); print(django.get_version())"
+
+      - name: Check gettext is available
+        # test_locale.py skips the .po/.mo sync check when msgfmt is missing, which
+        # would let a stale catalog through CI unnoticed.
+        run: msgfmt --version
+
+      - name: Run test suite
+        run: pytest -q
+
+  build:
+    name: build and metadata check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+
+      - name: Validate distribution metadata
+        run: python -m twine check dist/*
+
+      - name: Assert the package data made it into the wheel
+        # The templates, static assets and compiled catalogs are the whole point of
+        # this package; a packaging change that drops them still imports fine.
+        run: |
+          python - <<'PY'
+          import glob, zipfile
+          wheel, = glob.glob('dist/*.whl')
+          names = zipfile.ZipFile(wheel).namelist()
+          for kind, pred in [
+              ('templates', lambda n: '/templates/' in n and n.endswith('.html')),
+              ('static', lambda n: '/static/' in n),
+              ('catalogs', lambda n: n.endswith('.mo')),
+          ]:
+              found = [n for n in names if pred(n)]
+              assert found, f'no {kind} in {wheel}'
+              print(f'{kind}: {len(found)}')
+          PY
