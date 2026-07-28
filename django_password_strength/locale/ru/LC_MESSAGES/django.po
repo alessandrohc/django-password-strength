@@ -17,15 +17,16 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: widgets.py:26 widgets.py:64
-msgid "Warning"
+#: templates/django_password_strength/widgets/progressbar-info.html:5
+#: templates/django_password_strength/widgets/strength-info.html:6
+msgid "Warning:"
 msgstr "Внимание!"
 
-#: widgets.py:26
+#: templates/django_password_strength/widgets/progressbar-info.html:9
 msgid ""
 "This password would take <em class=\"password_strength_time\"></em> to crack."
 msgstr "Потребуется <em class=\"password_strength_time\"></em> на взлом."
 
-#: widgets.py:64
+#: templates/django_password_strength/widgets/strength-info.html:10
 msgid "Your passwords don't match."
 msgstr "Пароли не совпадают."
