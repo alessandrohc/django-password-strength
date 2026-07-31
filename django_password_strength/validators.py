@@ -1,6 +1,7 @@
-import password_strength as pwd
 from django.core.validators import BaseValidator
 from django.utils.translation import gettext, ngettext_lazy
+
+from django_password_strength.strength import PasswordStats
 
 
 class PolicyBaseValidator(BaseValidator):
@@ -19,7 +20,7 @@ class PolicyMinLengthValidator(PolicyBaseValidator):
         super(PolicyMinLengthValidator, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        return pwd.PasswordStats(value).length
+        return PasswordStats(value).length
 
     def compare(self, value, limit_value):
         return value < limit_value
@@ -42,7 +43,7 @@ class PolicyContainSpecialCharsValidator(PolicyBaseValidator):
         super(PolicyContainSpecialCharsValidator, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        return pwd.PasswordStats(value).special_characters
+        return PasswordStats(value).special_characters
 
     def compare(self, value, limit_value):
         return value < limit_value
@@ -67,7 +68,7 @@ class PolicyContainLowercaseValidator(PolicyBaseValidator):
         super(PolicyContainLowercaseValidator, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        return pwd.PasswordStats(value).letters_lowercase
+        return PasswordStats(value).letters_lowercase
 
     def compare(self, value, limit_value):
         return value < limit_value
@@ -92,7 +93,7 @@ class PolicyContainUppercaseValidator(PolicyBaseValidator):
         super(PolicyContainUppercaseValidator, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        return pwd.PasswordStats(value).letters_uppercase
+        return PasswordStats(value).letters_uppercase
 
     def compare(self, value, limit_value):
         return value < limit_value
@@ -117,7 +118,7 @@ class PolicyContainNumbersValidator(PolicyBaseValidator):
         super(PolicyContainNumbersValidator, self).__init__(*args, **kwargs)
 
     def clean(self, value):
-        return pwd.PasswordStats(value).numbers
+        return PasswordStats(value).numbers
 
     def compare(self, value, limit_value):
         return value < limit_value

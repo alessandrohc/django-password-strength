@@ -40,12 +40,11 @@ classifiers = [
 ]
 dependencies = [
     "Django>=4.2,<6.0",
-    # Upstream on PyPI. The former direct reference to the
-    # alessandrohc/py-password-strength fork was dropped in 1.5.0: the fork's runtime
-    # package is byte-identical to this release apart from a `__version__` line, its
-    # changes being confined to test tooling. 0.0.5 of the fork also satisfies this
-    # range, so environments already carrying it need no reinstall.
-    "password-strength>=0.0.3.post2",
+    # `password-strength` was dropped in 1.6.0: its upstream is archived (read-only since
+    # 2020, last released 2019) and only five character counters were ever used, which now
+    # live in `django_password_strength/strength.py`. Dropping it also silences pip over
+    # the pre-PEP 440 version strings on its 2015 releases, whose wheel filenames pip
+    # parses off the index and, since 25.3, rejects.
 ]
 
 [project.optional-dependencies]

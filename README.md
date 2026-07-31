@@ -11,6 +11,12 @@ See [Credits](#credits) for the upstream history.
 Python **3.10 – 3.13**, Django **4.2 – 5.2**. Every combination in that range is exercised
 in CI, except the two Django releases that predate Python 3.13 support (4.2 and 5.0).
 
+Django is the only runtime dependency. The `password-strength` package it used to require
+was absorbed in 1.6.0: only five character counters were ever used, its upstream is
+archived, and its 2015 releases carry version strings that predate PEP 440 — which pip
+reads off the index and, from 25.3, rejects. The counters now live in
+`django_password_strength/strength.py`, built on `unicodedata` alone.
+
 ### Install:
 
     pip install git+https://github.com/alessandrohc/django-password-strength.git@1.5.0
