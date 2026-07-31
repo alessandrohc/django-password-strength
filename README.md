@@ -19,11 +19,11 @@ reads off the index and, from 25.3, rejects. The counters now live in
 
 ### Install:
 
-    pip install git+https://github.com/alessandrohc/django-password-strength.git@1.5.0
+    pip install git+https://github.com/alessandrohc/django-password-strength.git@1.6.0
 
 Or pin it in `requirements.txt`:
 
-    django-password-strength @ git+https://github.com/alessandrohc/django-password-strength.git@1.5.0
+    django-password-strength @ git+https://github.com/alessandrohc/django-password-strength.git@1.6.0
 
 ### Usage:
 
