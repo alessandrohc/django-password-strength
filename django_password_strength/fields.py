@@ -70,7 +70,7 @@ class PasswordField(PasswordCharField):
             self.validators.append(PolicyContainNumbersValidator(int(numbers_length)))
 
         # Publish the policy to the widget. These keys are configuration, not HTML: the
-        # widget renders them into its rules script and strips them before the attrs
+        # widget serialises them into its data attribute and strips them before the attrs
         # become an <input> -- see PasswordInputBase.config_attrs.
         validators_attrs = self.widget_validators_attrs(self.widget)
         if validators_attrs and hasattr(self.widget, "attrs"):

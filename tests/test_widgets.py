@@ -5,11 +5,12 @@ the widget API down across Django versions: `Widget.render`, `Widget.build_attrs
 `PasswordInput.get_context` are the three framework hooks the package overrides or
 depends on, and a signature change in any of them shows up here as a failure.
 """
-import re
-
 import pytest
 
-from django_password_strength.validators import PolicyMinLengthValidator
+from django_password_strength.validators import (
+    PolicyContainSpecialCharsValidator,
+    PolicyMinLengthValidator,
+)
 from django_password_strength.widgets import (
     PasswordConfirmationInput,
     PasswordInputBase,
@@ -17,16 +18,12 @@ from django_password_strength.widgets import (
     PasswordMutedInput,
     PasswordStrengthInput,
 )
+from tests.helpers import input_tag, rules_payload
 
 ALL_WIDGETS = [PasswordStrengthInput, PasswordMutedInput, PasswordConfirmationInput]
 
-
-def input_tag(html):
-    """Just the `<input>` element, so assertions about the field itself are not
-    satisfied by a coincidental match in the surrounding markup or script block."""
-    match = re.search(r'<input[^>]*>', html)
-    assert match, f'no <input> found in: {html!r}'
-    return match.group(0)
+#: The widgets that publish a client-side policy. The confirmation widget has none.
+RULES_WIDGETS = [PasswordStrengthInput, PasswordMutedInput]
 
 
 class TestPasswordStrengthInput:
@@ -36,7 +33,7 @@ class TestPasswordStrengthInput:
         assert 'password_strength_bar_wrap' in html
         assert '<input type="password"' in html
         assert 'password_strength_info' in html
-        assert 'password_strength_rules' in html
+        assert 'data-password-rules' in html
 
     def test_input_carries_the_strength_class(self, attrs):
         html = PasswordStrengthInput().render('passphrase', None, attrs)
@@ -73,29 +70,21 @@ class TestPasswordStrengthInput:
         assert 'autocomplete="current-password"' in html
         assert 'new-password' not in html
 
-    def test_rules_script_targets_the_field_id(self, attrs):
-        html = PasswordStrengthInput().render('passphrase', None, attrs)
-
-        # The generated script hooks the element by auto id; losing `id` from the
-        # attrs that reach the template silently disables the client-side rules.
-        assert '$("#id_passphrase")' in html
-
-    def test_validators_are_serialised_into_the_rules_script(self, attrs):
+    def test_validators_are_serialised_into_the_payload(self, attrs):
         widget = PasswordStrengthInput()
         widget.attrs['validators'] = [PolicyMinLengthValidator(8).js_requirement()]
 
-        html = widget.render('passphrase', None, attrs)
+        payload = rules_payload(widget.render('passphrase', None, attrs))
 
-        assert '"minlength"' in html
-        assert '"minLength": 8' in html
+        assert payload['rules']['minlength']['minLength'] == 8
 
-    def test_validators_defaults_reaches_the_rules_script(self, attrs):
+    def test_validators_defaults_reaches_the_payload(self, attrs):
         widget = PasswordStrengthInput()
         widget.attrs['validators_defaults'] = False
 
-        html = widget.render('passphrase', None, attrs)
+        payload = rules_payload(widget.render('passphrase', None, attrs))
 
-        assert 'defaults: false' in html
+        assert payload['defaults'] is False
 
     def test_media_bundles_zxcvbn_and_the_stylesheet(self):
         media = str(PasswordStrengthInput().media)
@@ -110,7 +99,7 @@ class TestPasswordMutedInput:
         html = PasswordMutedInput().render('passphrase', None, attrs)
 
         assert '<input type="password"' in html
-        assert 'password_strength_rules' in html
+        assert 'data-password-rules' in html
         # This is the whole point of the muted variant.
         assert 'password_strength_bar_wrap' not in html
         assert 'password_strength_info' not in html
@@ -176,13 +165,17 @@ class TestConfigurationIsNotHtml:
         assert 'show_progressbar_info' not in tag
 
     def test_configuration_still_drives_the_markup(self, attrs):
-        """Stripping must happen on the way to the HTML, not before the markup is built."""
+        """Stripping must happen on the way to the HTML, not before the markup is built.
+
+        The policy is read off the very attrs the keys are stripped from, so the order
+        of those two steps is load-bearing: strip first and the payload comes out empty.
+        """
         widget = PasswordStrengthInput()
         widget.attrs['validators'] = [PolicyMinLengthValidator(8).js_requirement()]
 
-        html = widget.render('passphrase', None, attrs)
+        payload = rules_payload(widget.render('passphrase', None, attrs))
 
-        assert '"minLength": 8' in html
+        assert payload['rules']['minlength']['minLength'] == 8
 
     def test_real_html_attributes_are_preserved(self, attrs):
         widget = PasswordStrengthInput()
@@ -208,8 +201,8 @@ class TestRenderIsRepeatable:
         first = widget.render('passphrase', None, dict(attrs))
         second = widget.render('passphrase', None, dict(attrs))
 
-        assert '"minLength": 8' in first
-        assert '"minLength": 8' in second
+        assert rules_payload(first)['rules']['minlength']['minLength'] == 8
+        assert rules_payload(second)['rules']['minlength']['minLength'] == 8
 
     def test_progressbar_info_flag_survives_a_second_render(self, attrs):
         widget = PasswordStrengthInput()
@@ -255,6 +248,99 @@ class TestCssClass:
         tag = input_tag(PasswordMutedInput().render('passphrase', None, attrs))
 
         assert 'class=' not in tag
+
+
+class TestClientPolicyPayload:
+    """The client-side policy travels on the `<input>` as data, never as inline script.
+
+    It used to be emitted as a bare inline `<script>` defining a jQuery plugin. Under a
+    Content-Security-Policy carrying `'strict-dynamic'` -- which cancels `'self'` for
+    scripts, so "no nonce" means blocked -- that script never executed, and because the
+    bundled initialiser guards on the plugin existing, the requirement popover simply
+    never appeared, with nothing in the console but the CSP violation itself.
+
+    An HTML attribute is not a script and cannot be blocked by any `script-src`, so
+    these tests pin the payload to the input rather than to any nonce plumbing.
+    """
+
+    @pytest.mark.parametrize('widget_class', ALL_WIDGETS)
+    def test_no_widget_emits_a_script_element(self, widget_class, attrs):
+        html = widget_class().render('passphrase', None, attrs)
+
+        assert '<script' not in html
+
+    @pytest.mark.parametrize('widget_class', RULES_WIDGETS)
+    def test_payload_is_valid_json_with_rules_and_defaults(self, widget_class, attrs):
+        payload = rules_payload(widget_class().render('passphrase', None, attrs))
+
+        # The two keys `PassRequirements` reads off its options argument.
+        assert set(payload) == {'rules', 'defaults'}
+
+    @pytest.mark.parametrize('widget_class', RULES_WIDGETS)
+    def test_payload_defaults_to_the_builtin_rules(self, widget_class, attrs):
+        """With no policy configured, the client falls back to its own default rules."""
+        payload = rules_payload(widget_class().render('passphrase', None, attrs))
+
+        assert payload['rules'] == {}
+        assert payload['defaults'] is True
+
+    def test_several_validators_merge_into_one_rules_object(self, attrs):
+        """Each validator contributes a single requirement, keyed by its own name."""
+        widget = PasswordStrengthInput()
+        widget.attrs['validators'] = [
+            PolicyMinLengthValidator(10).js_requirement(),
+            PolicyContainSpecialCharsValidator(2).js_requirement(),
+        ]
+
+        payload = rules_payload(widget.render('passphrase', None, attrs))
+
+        assert set(payload['rules']) == {'minlength', 'containSpecialChars'}
+        assert payload['rules']['minlength']['minLength'] == 10
+        assert payload['rules']['containSpecialChars']['minLength'] == 2
+
+    def test_regex_requirements_survive_as_strings(self, attrs):
+        """`PassRequirements` compiles a string `regex` itself, which is what makes the
+        policy JSON-serialisable at all -- a compiled pattern could not cross the wire."""
+        widget = PasswordStrengthInput()
+        widget.attrs['validators'] = [
+            PolicyContainSpecialCharsValidator(1).js_requirement()]
+
+        rules = rules_payload(widget.render('passphrase', None, attrs))['rules']
+
+        assert rules['containSpecialChars']['regex'] == '([^!%&@#$^*?_~])'
+        assert rules['containSpecialChars']['regex_flags'] == 'g'
+
+    def test_requirement_text_is_included_for_the_popover(self, attrs):
+        widget = PasswordStrengthInput()
+        widget.attrs['validators'] = [PolicyMinLengthValidator(8).js_requirement()]
+
+        rules = rules_payload(widget.render('passphrase', None, attrs))['rules']
+
+        assert rules['minlength']['text']
+
+    def test_the_confirmation_widget_publishes_no_policy(self, attrs):
+        """It has no requirement list of its own -- only the mismatch warning."""
+        tag = input_tag(PasswordConfirmationInput().render('confirm', None, attrs))
+
+        assert 'data-password-rules' not in tag
+
+    def test_two_fields_get_independent_payloads(self, attrs):
+        """Two password fields on one page must each carry their own policy.
+
+        The inline script this replaced defined a single `$.fn.password_strength_rules`
+        with the target id baked into its body, so every render overwrote the previous
+        one: only the last field on the page kept a working popover.
+        """
+        strict = PasswordStrengthInput()
+        strict.attrs['validators'] = [PolicyMinLengthValidator(12).js_requirement()]
+        lax = PasswordStrengthInput()
+        lax.attrs['validators'] = [PolicyMinLengthValidator(6).js_requirement()]
+
+        first = strict.render('passphrase', None, {'id': 'id_passphrase'})
+        second = lax.render('other', None, {'id': 'id_other'})
+
+        assert rules_payload(first)['rules']['minlength']['minLength'] == 12
+        assert rules_payload(second)['rules']['minlength']['minLength'] == 6
 
 
 class TestWidgetContract:

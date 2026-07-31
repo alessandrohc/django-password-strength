@@ -1,3 +1,5 @@
+import json
+
 from django.forms import PasswordInput
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -24,20 +26,57 @@ class PasswordInputBase(PasswordInput):
     #: CSS class the bundled JavaScript hooks onto. None for widgets with no behaviour.
     css_class = None
 
+    #: Whether this widget publishes a client-side policy for the bundled JavaScript.
+    publishes_policy = False
+
+    #: Attribute the policy is published under. Kept in one place because
+    #: ``password-strength-rules.js`` selects on it.
+    policy_attr = 'data-password-rules'
+
     def get_context(self, name, value, attrs):
-        """Drop the configuration keys and apply ``css_class`` on the way to the HTML.
+        """Publish the policy, drop the configuration keys, apply ``css_class``.
 
         ``Widget.render`` calls this with ``self.attrs`` already merged over the caller's
         attrs, which makes it the last point where the two kinds of key are still
         together -- and, unlike ``render``, one that every code path goes through.
+
+        Order matters: the policy is built from the very keys stripped right after, so
+        publishing has to come first or the payload comes out empty.
         """
         context = super().get_context(name, value, attrs)
         widget_attrs = context['widget']['attrs']
+        if self.publishes_policy:
+            widget_attrs[self.policy_attr] = self.policy_payload(widget_attrs)
         for key in self.config_attrs:
             widget_attrs.pop(key, None)
         if self.css_class:
             widget_attrs['class'] = self.css_classes(widget_attrs.get('class'))
         return context
+
+    def policy_payload(self, attrs):
+        """The client-side password policy as JSON, for ``PassRequirements`` to consume.
+
+        It rides on the ``<input>`` as a data attribute rather than in an inline
+        ``<script>``, which is what this used to emit. A nonce-less inline script is
+        blocked outright by a Content-Security-Policy carrying ``'strict-dynamic'`` --
+        that keyword cancels ``'self'`` for scripts, so "no nonce" means blocked, not
+        "allowed by origin". Because the bundled initialiser only acts when the script
+        managed to define its jQuery plugin, the blocked script took the whole
+        requirement popover with it and left nothing behind but the CSP violation.
+
+        An attribute cannot be blocked by any ``script-src``, and being per-element it
+        also gives each field its own policy: the inline script declared a single
+        ``$.fn.password_strength_rules`` with the target id baked into its body, so on a
+        page with two password fields every render overwrote the previous one.
+        """
+        rules = {}
+        # One requirement per validator, each keyed by its own name.
+        for requirement in attrs.get('validators') or ():
+            rules.update(requirement)
+        return json.dumps({
+            'rules': rules,
+            'defaults': attrs.get('validators_defaults', True),
+        })
 
     def css_classes(self, existing):
         """``css_class`` appended to whatever the caller already asked for, at most once."""
@@ -56,16 +95,6 @@ class PasswordInputBase(PasswordInput):
         attrs.setdefault('autocomplete', 'new-password')
         return attrs
 
-    def strength_rules(self, attrs):
-        """The script block binding the client-side policy to this field."""
-        return render_to_string(
-            "django_password_strength/widgets/strength-rules.html",
-            context={
-                'attrs': attrs,
-                'validators': self.attrs.get('validators', []),
-                'validators_defaults': self.attrs.get('validators_defaults', True),
-            })
-
 
 #: Deprecated alias. The Django < 1.11 ``build_attrs`` shim it used to carry is gone --
 #: ``build_attrs`` is Django's own again. Subclass ``PasswordInputBase`` instead.
@@ -74,6 +103,8 @@ PasswordInputCompat = PasswordInputBase
 
 class PasswordMutedInput(PasswordInputBase):
     """Password input with the requirement list but no strength meter."""
+
+    publishes_policy = True
 
     class Media:
         js = (
@@ -85,11 +116,7 @@ class PasswordMutedInput(PasswordInputBase):
         }
 
     def render(self, name, value, attrs=None, renderer=None):
-        attrs = self.markup_attrs(attrs)
-
-        html = super().render(name, value, attrs, renderer)
-        html += self.strength_rules(attrs)
-        return mark_safe(html)
+        return super().render(name, value, self.markup_attrs(attrs), renderer)
 
 
 class PasswordStrengthInput(PasswordInputBase):
@@ -98,6 +125,7 @@ class PasswordStrengthInput(PasswordInputBase):
     """
 
     css_class = 'password_strength'
+    publishes_policy = True
 
     def render(self, name, value, attrs=None, renderer=None):
         attrs = self.markup_attrs(attrs)
@@ -109,7 +137,6 @@ class PasswordStrengthInput(PasswordInputBase):
         if self.attrs.get('show_progressbar_info', True):
             html += render_to_string(
                 "django_password_strength/widgets/progressbar-info.html", context=attrs)
-        html += self.strength_rules(attrs)
         return mark_safe(html)
 
     class Media:

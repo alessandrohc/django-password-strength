@@ -1,8 +1,8 @@
 """The `jsonify` filter.
 
-`strength-rules.html` pipes every requirement through `jsonify|safe` straight into a
-`<script>` block, so this filter is the only thing standing between a policy dict and
-executable page content.
+No template in the package uses it any more -- the widgets serialise their policy in
+Python and publish it as a data attribute. It stays part of the public template library
+because a consuming project may well have loaded it, so it keeps its tests.
 """
 from django.template import Context, Template
 

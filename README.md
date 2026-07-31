@@ -24,8 +24,24 @@ Or pin it in `requirements.txt`:
 * Add `django_password_strength` to the installed apps of your Django Project
 * Instead of using the django `PasswordInput` widget use the `PasswordStrengthInput`
 * Be sure to include the form's required media in the template. _ie._ `{{ form.media }}`
-* If you bundle your js you can use `django_password_strength/js/zxcvbn.js` or `django_password_strength/js/zxcvbn-async.js` and `django_password_strength/js/password_strength.js` instead
+* If you bundle your js yourself, take the files from `django_password_strength/js/` instead of relying on `{{ form.media }}`, keeping them in this order:
+  * `zxcvbn.js` (or `zxcvbn-async.js`) -- the strength estimator, needed only by `PasswordStrengthInput`
+  * `password-strength.js` -- the meter and the confirmation match
+  * `password-requirements.js` -- the requirement popover
+  * `password-strength-rules.js` -- binds each field's policy to that popover, and so must come after it
 * For easiest integration also include [Twitter Bootstrap](http://getbootstrap.com/)
+
+### Content Security Policy:
+
+The widgets emit no inline `<script>`. A field's password policy is serialised to JSON and
+published on the `<input>` itself, in a `data-password-rules` attribute that
+`password-strength-rules.js` reads on load. That keeps the package working under a strict
+policy without any nonce or hash plumbing on your side -- in particular under a
+`script-src` carrying `'strict-dynamic'`, which cancels `'self'` for scripts and so blocks
+any inline block that lacks a nonce.
+
+Only the bundled `.js` files need to be allowed, and `{{ form.media }}` already emits them
+as ordinary `<script src>` tags.
 
 ### Translations:
 

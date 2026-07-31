@@ -2,7 +2,7 @@
 
 `PasswordField` wires three things together: it picks a widget from `strength_view`,
 turns the `*_length` keywords into policy validators, and copies each validator's
-`js_requirement()` into `widget.attrs` so the rules script can be rendered. The form
+`js_requirement()` into `widget.attrs` so the widget can publish the policy. The form
 level tests at the bottom mirror how the project declares these fields -- as class
 attributes on a Form, which is the path that goes through Django's per-instance
 `deepcopy` of `base_fields`.
@@ -27,6 +27,7 @@ from django_password_strength.widgets import (
     PasswordMutedInput,
     PasswordStrengthInput,
 )
+from tests.helpers import rules_payload
 
 
 class TestWidgetSelection:
@@ -137,9 +138,10 @@ class TestFormIntegration:
         html = str(SignupForm()['passphrase'])
 
         assert 'password_strength_bar_wrap' in html
-        assert '$("#id_passphrase")' in html
-        assert '"minLength": 8' in html
-        assert 'defaults: false' in html
+
+        payload = rules_payload(html)
+        assert payload['rules']['minlength']['minLength'] == 8
+        assert payload['defaults'] is False
 
     def test_confirmation_field_points_back_at_the_password(self):
         html = str(SignupForm()['confirm_passphrase'])
@@ -170,15 +172,15 @@ class TestFormIntegration:
         first = str(SignupForm()['passphrase'])
         second = str(SignupForm()['passphrase'])
 
-        assert '"minLength": 8' in first
-        assert '"minLength": 8' in second
+        assert rules_payload(first)['rules']['minlength']['minLength'] == 8
+        assert rules_payload(second)['rules']['minlength']['minLength'] == 8
 
     def test_invalid_form_redisplay_keeps_the_policy(self):
         """The realistic re-render: a fresh form is built from POST data after a
-        failed submit, and the rules script has to come back with it."""
+        failed submit, and the policy has to come back with it."""
         form = SignupForm(data={'passphrase': 'abc', 'confirm_passphrase': 'abc'})
         assert not form.is_valid()
 
         html = str(form['passphrase'])
 
-        assert '"minLength": 8' in html
+        assert rules_payload(html)['rules']['minlength']['minLength'] == 8
